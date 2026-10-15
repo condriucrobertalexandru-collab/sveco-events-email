@@ -13,6 +13,7 @@ export async function handler(event) {
   }
 
   let payload;
+
   try {
     payload = JSON.parse(event.body || "{}");
   } catch {
@@ -44,64 +45,52 @@ export async function handler(event) {
     });
   }
 
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user,
-        pass: appPassword,
-      },
-    });
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: user,
+      pass: appPassword,
+    },
+  });
 
+  try {
     await transporter.sendMail({
-      from: `"Sveco Events" <${user}>`,
+      from: user,
       to: email,
       subject: "Am primit cererea ta — Sveco Events",
-      text: `Bună ${name}!
-
-Îți mulțumim că ai contactat Sveco Events — „Pentru că ne pasă!”
-
-Am primit cererea ta și vom analiza detaliile evenimentului. Revenim către tine în cel mai scurt timp pentru a discuta despre serviciile potrivite.
-
-Cu drag,
-Echipa Sveco Events
-${user}`,
+      text:
+        "Bună " + name + "!\n\n" +
+        "Îți mulțumim că ai contactat Sveco Events — „Pentru că ne pasă!”\n\n" +
+        "Am primit cererea ta și vom analiza detaliile evenimentului. " +
+        "Revenim către tine în cel mai scurt timp pentru a discuta despre serviciile potrivite.\n\n" +
+        "Cu drag,\nEchipa Sveco Events\n" + user,
     });
-
-    try {
-      await transporter.sendMail({
-        from: `"Sveco Events" <${user}>`,
-        to: notificationEmail,
-        replyTo: email,
-        subject: `Cerere nouă de ofertă — ${name}`,
-        text: `Ai primit o cerere nouă prin site-ul Sveco Events.
-
-Nume: ${name}
-Email client: ${email}
-Telefon: ${phone || "Nespecificat"}
-Data evenimentului: ${date || "Nespecificată"}
-Număr de invitați: ${guests || "Nespecificat"}
-
-Mesaj și servicii solicitate:
-${msg || "Nu a fost adăugat un mesaj."}
-
----
-Notificare automată de la site-ul Sveco Events.`,
-      });
-    } catch (error) {
-      console.error(
-        "Company notification failed:",
-        error?.message || "unknown error"
-      );
-    }
-
-    return json(200, { ok: true });
   } catch (error) {
-    console.error(
-      "Customer confirmation failed:",
-      error?.message || "unknown error"
-    );
+    console.error("Customer confirmation failed:", error?.message || "unknown error");
     return json(502, { error: "Could not send confirmation email" });
   }
+
+  try {
+    await transporter.sendMail({
+      from: user,
+      to: notificationEmail,
+      replyTo: email,
+      subject: "Cerere nouă de ofertă — " + name,
+      text:
+        "Ai primit o cerere nouă prin site-ul Sveco Events.\n\n" +
+        "Nume: " + name + "\n" +
+        "Email client: " + email + "\n" +
+        "Telefon: " + (phone || "Nespecificat") + "\n" +
+        "Data evenimentului: " + (date || "Nespecificată") + "\n" +
+        "Număr de invitați: " + (guests || "Nespecificat") + "\n\n" +
+        "Mesaj și servicii solicitate:\n" +
+        (msg || "Nu a fost adăugat un mesaj.") +
+        "\n\nNotificare automată de la site-ul Sveco Events.",
+    });
+  } catch (error) {
+    console.error("Company notification failed:", error?.message || "unknown error");
+  }
+
+  return json(200, { ok: true });
 }
 ```
