@@ -222,9 +222,14 @@ document.getElementById("form").addEventListener("submit", async function(e) {
       const confirmation = await fetch("/.netlify/functions/send-confirmation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.get("name"),
-          email: data.get("email")
+       body: JSON.stringify({
+  name: data.get("name"),
+  email: data.get("email"),
+  phone: data.get("phone"),
+  date: data.get("date"),
+  guests: data.get("guests"),
+  msg: data.get("msg")
+})
         })
       });
       confirmationSent = confirmation.ok;
