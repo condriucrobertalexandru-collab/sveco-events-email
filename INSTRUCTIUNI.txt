@@ -1,0 +1,26 @@
+SVECO EVENTS — confirmare automată pe email
+
+CE CONȚINE
+- index.html: pagina site-ului cu formularul existent și apel către funcția de confirmare
+- netlify/functions/send-confirmation.mjs: funcția care trimite emailul
+- package.json: dependența Nodemailer
+- netlify.toml: configurarea Netlify
+
+IMPORTANT
+Acest pachet nu poate fi publicat ca funcție server-side doar prin simpla încărcare a ZIP-ului în zona de deploy manual. Netlify trebuie să construiască și să publice funcția. Folosește un deploy conectat la un repository Git (recomandat) sau Netlify CLI.
+
+CONFIGURARE GMAIL
+1. Contul Gmail trebuie să aibă Verificarea în doi pași activată.
+2. Creează o parolă pentru aplicație în https://myaccount.google.com/apppasswords
+3. În Netlify > Site configuration > Environment variables, adaugă:
+   GMAIL_USER = fe.svecoevents.srl@gmail.com
+   GMAIL_APP_PASSWORD = parola de aplicație (fără spații)
+   Nu adăuga aceste valori în index.html și nu le trimite nimănui.
+4. Fă un nou deploy după ce ai configurat variabilele.
+
+TESTARE
+Trimite o cerere cu o adresă de email la care ai acces. Verifică inboxul și Spam.
+Dacă formularul este înregistrat, dar emailul nu pleacă, verifică logs pentru funcția send-confirmation în Netlify.
+
+NOTĂ
+Formularul Netlify este trimis primul. Dacă emailul de confirmare nu poate fi trimis, cererea rămâne înregistrată, iar pagina afișează un mesaj corespunzător.
